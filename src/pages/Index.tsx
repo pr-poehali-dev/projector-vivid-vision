@@ -7,6 +7,7 @@ import { ServicesSection } from "@/components/sections/services-section"
 import { AboutSection } from "@/components/sections/about-section"
 import { ContactSection } from "@/components/sections/contact-section"
 import { FilterPanel, type FilterState } from "@/components/filter-panel"
+import { MagneticButton } from "@/components/magnetic-button"
 import { useRef, useEffect, useState } from "react"
 
 export default function Index() {
