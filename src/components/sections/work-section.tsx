@@ -2,6 +2,7 @@ import { useState } from "react"
 import { createPortal } from "react-dom"
 import { useReveal } from "@/hooks/use-reveal"
 import Icon from "@/components/ui/icon"
+import type { FilterState } from "@/components/filter-panel"
 
 type University = {
   number: string
@@ -9,6 +10,7 @@ type University = {
   category: string
   city: string
   score: string
+  minTotal: number
   direction: string
   founded: string
   website: string
@@ -27,6 +29,7 @@ const universities: University[] = [
     category: "Факультет вычислительной математики и кибернетики",
     city: "Москва",
     score: "от 280 баллов",
+    minTotal: 280,
     direction: "left",
     founded: "1755",
     website: "https://www.msu.ru",
@@ -48,6 +51,7 @@ const universities: University[] = [
     category: "Факультет информационной безопасности (ИУ8)",
     city: "Москва",
     score: "от 260 баллов",
+    minTotal: 260,
     direction: "right",
     founded: "1830",
     website: "https://www.bmstu.ru",
@@ -69,6 +73,7 @@ const universities: University[] = [
     category: "Факультет компьютерных наук",
     city: "Москва",
     score: "от 290 баллов",
+    minTotal: 290,
     direction: "left",
     founded: "1992",
     website: "https://www.hse.ru",
@@ -90,6 +95,7 @@ const universities: University[] = [
     category: "Математико-механический факультет",
     city: "Санкт-Петербург",
     score: "от 270 баллов",
+    minTotal: 270,
     direction: "right",
     founded: "1724",
     website: "https://www.spbu.ru",
@@ -111,6 +117,7 @@ const universities: University[] = [
     category: "Институт интеллектуальных кибернетических систем",
     city: "Москва",
     score: "от 255 баллов",
+    minTotal: 255,
     direction: "left",
     founded: "1942",
     website: "https://mephi.ru",
@@ -132,6 +139,7 @@ const universities: University[] = [
     category: "Факультет безопасности информационных технологий",
     city: "Санкт-Петербург",
     score: "от 265 баллов",
+    minTotal: 265,
     direction: "right",
     founded: "1900",
     website: "https://itmo.ru",
@@ -153,6 +161,7 @@ const universities: University[] = [
     category: "Факультет защиты информации",
     city: "Москва",
     score: "от 195 баллов",
+    minTotal: 195,
     direction: "left",
     founded: "1991",
     website: "https://www.rsuh.ru",
@@ -174,6 +183,7 @@ const universities: University[] = [
     category: "Институт радиоэлектроники и информационных технологий",
     city: "Екатеринбург",
     score: "от 220 баллов",
+    minTotal: 220,
     direction: "right",
     founded: "1920",
     website: "https://urfu.ru",
@@ -195,6 +205,7 @@ const universities: University[] = [
     category: "Факультет информационных технологий",
     city: "Новосибирск",
     score: "от 240 баллов",
+    minTotal: 240,
     direction: "left",
     founded: "1958",
     website: "https://www.nsu.ru",
@@ -216,6 +227,7 @@ const universities: University[] = [
     category: "Институт вычислительной математики и информационных технологий",
     city: "Казань",
     score: "от 210 баллов",
+    minTotal: 210,
     direction: "right",
     founded: "1804",
     website: "https://kpfu.ru",
@@ -315,9 +327,15 @@ function UniversityModal({ university, onClose }: { university: University; onCl
   )
 }
 
-export function WorkSection() {
+export function WorkSection({ filter }: { filter: FilterState }) {
   const { ref, isVisible } = useReveal(0.3)
   const [selected, setSelected] = useState<University | null>(null)
+
+  const filtered = universities.filter((u) => {
+    const cityMatch = filter.city === "Все города" || u.city === filter.city
+    const scoreMatch = u.minTotal <= filter.maxScore
+    return cityMatch && scoreMatch
+  })
 
   return (
     <>
@@ -336,13 +354,23 @@ export function WorkSection() {
             </h2>
             <p className="font-mono text-sm text-foreground/60 md:text-base">
               / Нажмите на название, чтобы узнать подробности
+              {filtered.length < universities.length && (
+                <span className="ml-2 font-mono text-xs text-primary/60">
+                  · показано {filtered.length} из {universities.length}
+                </span>
+              )}
             </p>
           </div>
 
           <div className="overflow-y-auto pr-1" style={{ maxHeight: "calc(100vh - 240px)", scrollbarWidth: "thin" }}>
-            {universities.map((uni, i) => (
+            {filtered.length === 0 && (
+              <p className="py-8 text-center font-mono text-sm text-foreground/40">
+                Нет вузов по выбранным критериям
+              </p>
+            )}
+            {filtered.map((uni, i) => (
               <div
-                key={i}
+                key={uni.number}
                 className={`group flex cursor-pointer items-center justify-between border-b border-foreground/10 py-3 transition-all duration-500 hover:border-foreground/25 md:py-3.5 ${
                   isVisible
                     ? "translate-x-0 opacity-100"

@@ -2,6 +2,7 @@ import { useState } from "react"
 import { createPortal } from "react-dom"
 import { useReveal } from "@/hooks/use-reveal"
 import Icon from "@/components/ui/icon"
+import type { FilterState } from "@/components/filter-panel"
 
 type College = {
   number: string
@@ -202,9 +203,13 @@ function CollegeModal({ college, onClose }: { college: College; onClose: () => v
   )
 }
 
-export function CollegesSection() {
+export function CollegesSection({ filter }: { filter: FilterState }) {
   const { ref, isVisible } = useReveal(0.3)
   const [selected, setSelected] = useState<College | null>(null)
+
+  const filtered = colleges.filter((c) => {
+    return filter.city === "Все города" || c.city === filter.city
+  })
 
   return (
     <>
@@ -223,13 +228,23 @@ export function CollegesSection() {
             </h2>
             <p className="font-mono text-sm text-foreground/60 md:text-base">
               / Нажмите на название, чтобы узнать подробности
+              {filtered.length < colleges.length && (
+                <span className="ml-2 font-mono text-xs text-primary/60">
+                  · показано {filtered.length} из {colleges.length}
+                </span>
+              )}
             </p>
           </div>
 
           <div className="overflow-y-auto pr-1" style={{ maxHeight: "calc(100vh - 240px)", scrollbarWidth: "thin" }}>
-            {colleges.map((college, i) => (
+            {filtered.length === 0 && (
+              <p className="py-8 text-center font-mono text-sm text-foreground/40">
+                Нет колледжей по выбранному городу
+              </p>
+            )}
+            {filtered.map((college, i) => (
               <div
-                key={i}
+                key={college.number}
                 className={`group flex cursor-pointer items-center justify-between border-b border-foreground/10 py-3 transition-all duration-500 hover:border-foreground/25 md:py-3.5 ${
                   isVisible
                     ? "translate-x-0 opacity-100"

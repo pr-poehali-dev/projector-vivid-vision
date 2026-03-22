@@ -6,13 +6,14 @@ import { CollegesSection } from "@/components/sections/colleges-section"
 import { ServicesSection } from "@/components/sections/services-section"
 import { AboutSection } from "@/components/sections/about-section"
 import { ContactSection } from "@/components/sections/contact-section"
-import { MagneticButton } from "@/components/magnetic-button"
+import { FilterPanel, type FilterState } from "@/components/filter-panel"
 import { useRef, useEffect, useState } from "react"
 
 export default function Index() {
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const [currentSection, setCurrentSection] = useState(0)
   const [isLoaded, setIsLoaded] = useState(false)
+  const [filter, setFilter] = useState<FilterState>({ city: "Все города", maxScore: 999 })
   const touchStartY = useRef(0)
   const touchStartX = useRef(0)
   const shaderContainerRef = useRef<HTMLDivElement>(null)
@@ -245,9 +246,11 @@ export default function Index() {
           ))}
         </div>
 
-        <MagneticButton variant="secondary" onClick={() => scrollToSection(4)}>
-          Предметы ЕГЭ
-        </MagneticButton>
+        <FilterPanel
+          filter={filter}
+          onChange={setFilter}
+          onEgeClick={() => scrollToSection(5)}
+        />
       </nav>
 
       <div
@@ -299,8 +302,8 @@ export default function Index() {
           </div>
         </section>
 
-        <WorkSection />
-        <CollegesSection />
+        <WorkSection filter={filter} />
+        <CollegesSection filter={filter} />
         <ServicesSection />
         <AboutSection scrollToSection={scrollToSection} />
         <ContactSection />
