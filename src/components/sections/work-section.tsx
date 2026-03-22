@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { createPortal } from "react-dom"
 import { useReveal } from "@/hooks/use-reveal"
 import Icon from "@/components/ui/icon"
 
@@ -378,7 +379,10 @@ export function WorkSection() {
         </div>
       </section>
 
-      {selected && <UniversityModal university={selected} onClose={() => setSelected(null)} />}
+      {selected && createPortal(
+        <UniversityModal university={selected} onClose={() => setSelected(null)} />,
+        document.body
+      )}
     </>
   )
 }
